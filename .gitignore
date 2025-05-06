@@ -1,0 +1,13 @@
+# Ignore IDE files
+.vscode/
+
+# Ignore virtual environments
+venv/
+env/
+.cloudsen-env/
+__pycache__/
+*.pyc
+
+# Ignore large data and models
+data/raw/
+data/processed/
