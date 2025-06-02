@@ -1,56 +1,69 @@
-import matplotlib
-matplotlib.use("Agg")
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "5"
 
 import tacoreader
-import matplotlib.pyplot as plt
+import torch
+import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader, random_split
+from torchvision.models.segmentation import deeplabv3_resnet50
 import rasterio as rio
 import numpy as np
-from rasterio.transform import Affine
-from rasterio.warp import transform_bounds
+from tqdm import tqdm
 
-cloudsen12_l1c = tacoreader.load("tacofoundation:cloudsen12-l1c")
-cloudsen12_l2a = tacoreader.load("tacofoundation:cloudsen12-l2a")
+class CloudSEN12Dataset(Dataset):
+    def __init__(self, records, band_indexes):
+        self.records = records
+        self.band_indexes = band_indexes
 
-sample = 1000
-s2l1c_str = cloudsen12_l1c.read(sample).read(0)
-s2l2a_str = cloudsen12_l2a.read(sample).read(0)
+    def __len__(self):
+        return len(self.records)
 
-with rio.open(s2l1c_str) as src:
-    s2l1c_data = src.read([4, 3, 2]).transpose(1, 2, 0) / 3000
-    transform_toa = src.transform
-    crs_toa = src.crs
-    height_toa, width_toa = src.height, src.width
+    def __getitem__(self, idx):
+        sample = self.records.read(idx)
+        image_path = sample.read(0)
+        mask_path = sample.read(1)
+        with rio.open(image_path) as img_src:
+            image = img_src.read(self.band_indexes, window=rio.windows.Window(0, 0, 256, 256)).astype(np.float32)
+            image = torch.from_numpy(image / 3000.0)
+        with rio.open(mask_path) as lbl_src:
+            mask = lbl_src.read(1, window=rio.windows.Window(0, 0, 256, 256)).astype(np.int64)
+            mask = torch.from_numpy(mask)
+        return image, mask
 
-with rio.open(s2l2a_str) as dst:
-    s2l2a_data = dst.read([4, 3, 2]).transpose(1, 2, 0) / 3000
-    transform_boa = dst.transform
-    crs_boa = dst.crs
-    height_boa, width_boa = dst.height, dst.width
+ds = tacoreader.load("tacofoundation:cloudsen12-l1c")
+high_quality = ds[ds["label_type"] == "high"]
+band_map = {'B2': 2, 'B3': 3, 'B4': 4, 'B8': 8, 'B11': 11, 'B12': 12}
+bands = sorted(band_map.values())
+dataset = CloudSEN12Dataset(high_quality, bands)
 
-s2l1c_data = np.clip(s2l1c_data, 0, 1)
-s2l2a_data = np.clip(s2l2a_data, 0, 1)
+train_size = int(0.8 * len(dataset))
+test_size = len(dataset) - train_size
+train_set, test_set = random_split(dataset, [train_size, test_size], generator=torch.Generator().manual_seed(42))
 
-left_toa, top_toa = transform_toa * (0, 0)
-right_toa, bottom_toa = transform_toa * (width_toa, height_toa)
-bbox_proj_toa = (left_toa, bottom_toa, right_toa, top_toa)
-bbox_latlon_toa = transform_bounds(crs_toa, "EPSG:4326", *bbox_proj_toa)
+train_loader = DataLoader(train_set, batch_size=1, shuffle=True)
+test_loader = DataLoader(test_set, batch_size=1)
 
-left_boa, top_boa = transform_boa * (0, 0)
-right_boa, bottom_boa = transform_boa * (width_boa, height_boa)
-bbox_proj_boa = (left_boa, bottom_boa, right_boa, top_boa)
-bbox_latlon_boa = transform_bounds(crs_boa, "EPSG:4326", *bbox_proj_boa)
+model = deeplabv3_resnet50(weights=None, num_classes=6)
+model.classifier[4] = nn.Conv2d(256, 6, kernel_size=1)
+model.backbone.conv1 = nn.Conv2d(6, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
-print(f"TOA bounding box (lat/lon): {bbox_latlon_toa}")
-print(f"BOA bounding box (lat/lon): {bbox_latlon_boa}")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = model.to(device)
 
-fig, ax = plt.subplots(1, 2, figsize=(10, 5))
-ax[0].imshow(s2l1c_data)
-ax[0].set_title("Sentinel-2 L1C")
-ax[0].axis("off")
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
-ax[1].imshow(s2l2a_data)
-ax[1].set_title("Sentinel-2 L2A")
-ax[1].axis("off")
-
-# plt.tight_layout()
-# plt.savefig("remote_cloudsen12_sample.png", dpi=150)
+for epoch in range(5):
+    model.train()
+    total_loss = 0
+    print(f"Epoch {epoch+1}")
+    for images, masks in tqdm(train_loader, desc="Training"):
+        images, masks = images.to(device), masks.to(device)
+        optimizer.zero_grad()
+        outputs = model(images)["out"]
+        loss = criterion(outputs, masks)
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item()
+    avg_loss = total_loss / len(train_loader)
+    print(f"Epoch {epoch+1} - Avg Loss: {avg_loss:.4f}")

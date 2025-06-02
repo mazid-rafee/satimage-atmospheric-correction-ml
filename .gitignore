@@ -11,3 +11,4 @@ __pycache__/
 # Ignore large data and models
 data/raw/
 data/processed/
+data/
