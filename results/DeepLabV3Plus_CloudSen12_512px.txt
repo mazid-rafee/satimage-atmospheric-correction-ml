@@ -1,0 +1,95 @@
+Epoch 10, Batch Size 8, Binary Class:
+-------------------------------------
+Encoder: resnet50 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mean IoU: 0.6250 | Mean F1: 0.6856
+Encoder: se_resnet50 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mean IoU: 0.6426 | Mean F1: 0.6996
+Encoder: efficientnet-b0 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mean IoU: 0.6616 | Mean F1: 0.7130
+Encoder: timm-efficientnet-b0 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mean IoU: 0.6637 | Mean F1: 0.7151
+Encoder: efficientnet-b3 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mean IoU: 0.6556 | Mean F1: 0.7090
+Encoder: timm-efficientnet-b3 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mean IoU: 0.6674 | Mean F1: 0.7173
+Encoder: efficientnet-b5 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mean IoU: 0.6673 | Mean F1: 0.7183
+Encoder: mobileone_s2 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mean IoU: 0.6381 | Mean F1: 0.6945
+Encoder: mobilenet_v2 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mean IoU: 0.6429 | Mean F1: 0.6988
+Encoder: mit_b3 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mean IoU: 0.6429 | Mean F1: 0.6997
+Encoder: mit_b4 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mean IoU: 0.6528 | Mean F1: 0.7075
+
+
+Epoch 10, Batch Size 8, Multi Class:
+------------------------------------
+
+Encoder: resnet50 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mode: multiclass | 
+  Class 0: IoU=0.8782, F1=0.9338
+  Class 1: IoU=0.8179, F1=0.8966
+  Class 2: IoU=0.3490, F1=0.4685
+  Class 3: IoU=0.5875, F1=0.7307
+  Mean IoU: 0.6581
+  Mean F1: 0.7574
+Encoder: se_resnet50 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mode: multiclass | 
+  Class 0: IoU=0.8910, F1=0.9412
+  Class 1: IoU=0.8073, F1=0.8888
+  Class 2: IoU=0.3236, F1=0.4367
+  Class 3: IoU=0.6143, F1=0.7528
+  Mean IoU: 0.6590
+  Mean F1: 0.7549
+Encoder: efficientnet-b0 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mode: multiclass | 
+  Class 0: IoU=0.8901, F1=0.9405
+  Class 1: IoU=0.8397, F1=0.9102
+  Class 2: IoU=0.4026, F1=0.5210
+  Class 3: IoU=0.6238, F1=0.7606
+  Mean IoU: 0.6890
+  Mean F1: 0.7831
+Encoder: timm-efficientnet-b0 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mode: multiclass | 
+  Class 0: IoU=0.8963, F1=0.9443
+  Class 1: IoU=0.8363, F1=0.9085
+  Class 2: IoU=0.4306, F1=0.5529
+  Class 3: IoU=0.6334, F1=0.7682
+  Mean IoU: 0.6991
+  Mean F1: 0.7935
+Encoder: efficientnet-b3 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mode: multiclass | 
+  Class 0: IoU=0.5941, F1=0.7221
+  Class 1: IoU=0.5244, F1=0.6691
+  Class 2: IoU=0.1235, F1=0.1856
+  Class 3: IoU=0.4852, F1=0.6442
+  Mean IoU: 0.4318
+  Mean F1: 0.5553
+Encoder: timm-efficientnet-b3 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mode: multiclass | 
+  Class 0: IoU=0.9018, F1=0.9475
+  Class 1: IoU=0.8420, F1=0.9120
+  Class 2: IoU=0.4038, F1=0.5244
+  Class 3: IoU=0.6510, F1=0.7821
+  Mean IoU: 0.6996
+  Mean F1: 0.7915
+Encoder: efficientnet-b5 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mode: multiclass | 
+  Class 0: IoU=0.8887, F1=0.9399
+  Class 1: IoU=0.8398, F1=0.9100
+  Class 2: IoU=0.3912, F1=0.5100
+  Class 3: IoU=0.5886, F1=0.7294
+  Mean IoU: 0.6771
+  Mean F1: 0.7723
+Encoder: mobileone_s2 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mode: multiclass | 
+  Class 0: IoU=0.8915, F1=0.9414
+  Class 1: IoU=0.8353, F1=0.9073
+  Class 2: IoU=0.3614, F1=0.4769
+  Class 3: IoU=0.6247, F1=0.7617
+  Mean IoU: 0.6782
+  Mean F1: 0.7718
+Encoder: mobilenet_v2 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mode: multiclass | 
+  Class 0: IoU=0.8828, F1=0.9363
+  Class 1: IoU=0.8270, F1=0.9020
+  Class 2: IoU=0.3173, F1=0.4341
+  Class 3: IoU=0.5965, F1=0.7374
+  Mean IoU: 0.6559
+  Mean F1: 0.7524
+Encoder: mit_b3 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mode: multiclass | 
+  Class 0: IoU=0.8757, F1=0.9322
+  Class 1: IoU=0.7853, F1=0.8741
+  Class 2: IoU=0.2151, F1=0.3174
+  Class 3: IoU=0.5844, F1=0.7279
+  Mean IoU: 0.6151
+  Mean F1: 0.7129
+Encoder: mit_b4 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] | Mode: multiclass | 
+  Class 0: IoU=0.8891, F1=0.9401
+  Class 1: IoU=0.8246, F1=0.9005
+  Class 2: IoU=0.3678, F1=0.4903
+  Class 3: IoU=0.6194, F1=0.7561
+  Mean IoU: 0.6752
+  Mean F1: 0.7718
