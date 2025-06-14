@@ -1,0 +1,14 @@
+Backbone: InternImage | Combo 1/1 | Bands: [4, 3, 2] | 
+  Class 0: IoU=0.8566, F1=0.9206
+  Class 1: IoU=0.8114, F1=0.8914
+  Class 2: IoU=0.3054, F1=0.4194
+  Class 3: IoU=0.5147, F1=0.6666
+  Mean IoU: 0.6220
+  Mean F1: 0.7245
+Backbone: InternImage | Combo 1/1 | Bands: [4, 3, 2] | 
+  Class 0: IoU=0.8795, F1=0.9347
+  Class 1: IoU=0.8436, F1=0.9135
+  Class 2: IoU=0.4298, F1=0.5693
+  Class 3: IoU=0.5947, F1=0.7396
+  Mean IoU: 0.6869
+  Mean F1: 0.7893
