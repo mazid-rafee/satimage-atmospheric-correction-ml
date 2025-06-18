@@ -1,0 +1,15 @@
+Encoder: swin-t | Bands: [3, 4, 10]
+  Class 0: IoU=0.8859, F1=0.9395
+  Class 1: IoU=0.8510, F1=0.9195
+  Class 2: IoU=0.4977, F1=0.6646
+  Class 3: IoU=0.6411, F1=0.7813
+  Mean IoU: 0.7189
+  Mean F1: 0.8262
+
+Encoder: swin-s | Bands: [3, 4, 10]
+  Class 0: IoU=0.9039, F1=0.9495
+  Class 1: IoU=0.8589, F1=0.9241
+  Class 2: IoU=0.5233, F1=0.6870
+  Class 3: IoU=0.6572, F1=0.7932
+  Mean IoU: 0.7358
+  Mean F1: 0.8385

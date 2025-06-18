@@ -1,3 +1,4 @@
-
 satimage-env
 internimage-env
+mmseg-env
+dinov2-env

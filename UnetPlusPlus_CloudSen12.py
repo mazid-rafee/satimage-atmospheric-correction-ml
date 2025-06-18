@@ -15,19 +15,19 @@ from tqdm import tqdm
 MODE = "multiclass"  # "binary" or "multiclass"
 
 band_combinations = [
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    [3, 4, 10]
 ]
 
 encoder_configs = [
-    {"name": "resnet50", "weights": "imagenet"},
-    {"name": "se_resnet50", "weights": "imagenet"},
-    {"name": "efficientnet-b0", "weights": "imagenet"},
-    {"name": "timm-efficientnet-b0", "weights": "imagenet"},
-    {"name": "efficientnet-b3", "weights": "imagenet"},
-    {"name": "timm-efficientnet-b3", "weights": "imagenet"},
-    {"name": "efficientnet-b5", "weights": "imagenet"},
-    {"name": "mobileone_s2", "weights": "imagenet"},
-    {"name": "mobilenet_v2", "weights": "imagenet"}
+    # {"name": "resnet50", "weights": "imagenet"},
+    # {"name": "se_resnet50", "weights": "imagenet"},
+    # {"name": "efficientnet-b0", "weights": "imagenet"},
+    # {"name": "timm-efficientnet-b0", "weights": "imagenet"},
+    # {"name": "efficientnet-b3", "weights": "imagenet"},
+    {"name": "timm-efficientnet-b3", "weights": "imagenet"}
+    # {"name": "efficientnet-b5", "weights": "imagenet"},
+    # {"name": "mobileone_s2", "weights": "imagenet"},
+    # {"name": "mobilenet_v2", "weights": "imagenet"}
 ]
 
 

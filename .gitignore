@@ -13,3 +13,7 @@ data/raw/
 data/processed/
 data/
 InternImage/
+DCNv4/
+mmsegmentation/
+work_dirs/
+dinov2/

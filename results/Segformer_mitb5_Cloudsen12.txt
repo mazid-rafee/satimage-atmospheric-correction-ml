@@ -1,0 +1,15 @@
+Bands: All 14 
+  Class 0: IoU=0.8968, F1=0.9456
+  Class 1: IoU=0.8538, F1=0.9211
+  Class 2: IoU=0.5343, F1=0.6964
+  Class 3: IoU=0.6649, F1=0.7987
+  Mean IoU: 0.7374
+  Mean F1: 0.8405
+
+Bands: [3, 4, 10]
+  Class 0: IoU=0.9099, F1=0.9528
+  Class 1: IoU=0.8613, F1=0.9255
+  Class 2: IoU=0.5445, F1=0.7051
+  Class 3: IoU=0.6878, F1=0.8150
+  Mean IoU: 0.7509
+  Mean F1: 0.8496

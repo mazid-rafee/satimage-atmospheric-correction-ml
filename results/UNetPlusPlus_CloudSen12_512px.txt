@@ -78,3 +78,10 @@ UNet++ | Encoder: mobilenet_v2 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 
   Class 3: IoU=0.6262, F1=0.7616
   Mean IoU: 0.6824
   Mean F1: 0.7770
+UNet++ | Encoder: timm-efficientnet-b3 | Combo 1/1 | Bands: [3, 4, 10] | Mode: multiclass | 
+  Class 0: IoU=0.8950, F1=0.9434
+  Class 1: IoU=0.8440, F1=0.9130
+  Class 2: IoU=0.3897, F1=0.5078
+  Class 3: IoU=0.6545, F1=0.7850
+  Mean IoU: 0.6958
+  Mean F1: 0.7873

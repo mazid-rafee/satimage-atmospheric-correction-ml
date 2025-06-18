@@ -93,3 +93,4 @@ Encoder: mit_b4 | Combo 1/1 | Bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
   Class 3: IoU=0.6194, F1=0.7561
   Mean IoU: 0.6752
   Mean F1: 0.7718
+

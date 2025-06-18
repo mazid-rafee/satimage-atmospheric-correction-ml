@@ -1,7 +1,7 @@
 import os
 import sys
-sys.path.append(os.path.abspath("InternImage/segmentation"))
-from mmseg_custom.models.backbones import InternImage
+sys.path.append(os.path.abspath("DCNv4/segmentation"))
+from mmseg_custom.models.backbones import FlashInternImage
 
 import torch
 import torch.nn as nn
@@ -14,7 +14,14 @@ from tqdm import tqdm
 from mmengine.config import Config
 from mmseg.models import build_segmentor
 
-band_combinations = [[4, 3, 2]]
+band_combinations = [
+    # [3, 4, 10],    # Green, Red, Cirrus
+    # [3, 8, 11],    # Green, NIR, SWIR1
+    [4, 6, 11],    # Red, RedEdge2, SWIR1
+    [2, 11, 12],   # Blue, SWIR1, SWIR2    
+    [4, 3, 2]     # RGB
+]
+
 
 class CloudSegmentationDataset(Dataset):
     def __init__(self, taco_path, indices, selected_bands):
@@ -40,12 +47,12 @@ def train_and_evaluate(bands, combo_index, total_combos, result_path):
     train_idx, test_idx = list(range(8000)), list(range(8000, 10000))
     train_set = CloudSegmentationDataset(taco_path, train_idx, bands)
     test_set = CloudSegmentationDataset(taco_path, test_idx, bands)
-    train_loader = DataLoader(train_set, batch_size=8, shuffle=True, num_workers=4)
-    test_loader = DataLoader(test_set, batch_size=8, shuffle=False, num_workers=4)
+    train_loader = DataLoader(train_set, batch_size=4, shuffle=True, num_workers=4)
+    test_loader = DataLoader(test_set, batch_size=4, shuffle=False, num_workers=4)
 
     num_classes = 4
 
-    cfg = Config.fromfile("InternImage/segmentation/configs/ade20k/upernet_internimage_b_512_160k_ade20k.py")
+    cfg = Config.fromfile("DCNv4/segmentation/configs/ade20k/upernet_flash_internimage_b_512_160k_ade20k.py")
     cfg.model.pretrained = None
     cfg.model.backbone.in_channels = 3
     cfg.model.decode_head.num_classes = num_classes
@@ -152,7 +159,7 @@ def train_and_evaluate(bands, combo_index, total_combos, result_path):
 
     os.makedirs(os.path.dirname(result_path), exist_ok=True)
     with open(result_path, "a") as f:
-        f.write(f"Backbone: InternImage | Combo {combo_index+1}/{total_combos} | Bands: {bands} | {metrics}\n")
+        f.write(f"Backbone: InternImage_DCNv4_b | Combo {combo_index+1}/{total_combos} | Bands: {bands} | {metrics}\n")
     print(f"Done InternImage | {metrics}")
 
 if __name__ == "__main__":
