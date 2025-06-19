@@ -1,0 +1,12 @@
+  Class 0: IoU=0.4877, F1=0.6556
+  Class 1: IoU=0.2003, F1=0.3338
+  Class 2: IoU=0.0196, F1=0.0385
+  Class 3: IoU=0.0307, F1=0.0595
+  Mean IoU: 0.1846
+  Mean F1: 0.2718
+  Class 0: IoU=0.4877, F1=0.6556
+  Class 1: IoU=0.2003, F1=0.3338
+  Class 2: IoU=0.0196, F1=0.0385
+  Class 3: IoU=0.0307, F1=0.0595
+  Mean IoU: 0.1846
+  Mean F1: 0.2718

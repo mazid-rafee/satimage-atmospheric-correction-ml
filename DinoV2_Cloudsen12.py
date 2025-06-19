@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '6'
 
 import torch
 import torch.nn as nn
@@ -17,13 +17,7 @@ import torchvision.transforms.functional as TF
 
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
-# warnings.filterwarnings(
-#     "ignore",
-#     message="The default value of the antialias parameter of all the resizing transforms"
-# )
 
-
-# Set reproducibility seed
 import random
 torch.manual_seed(42)
 np.random.seed(42)
@@ -45,18 +39,15 @@ class CloudSegmentationDataset(Dataset):
         s2_l1c_path = record.read(0)
         s2_label_path = record.read(1)
 
-        # Read both image and label inside the context manager
         with rio.open(s2_l1c_path) as src, rio.open(s2_label_path) as dst:
             img = src.read(indexes=self.selected_bands).astype(np.float32)
             label = dst.read(1).astype(np.uint8)
 
-        # Convert to tensor and normalize the image
         img = torch.from_numpy(img / 3000.0).float()
         mean = torch.tensor([0.485, 0.456, 0.406]).view(-1, 1, 1)
         std = torch.tensor([0.229, 0.224, 0.225]).view(-1, 1, 1)
         img = (img - mean) / std
 
-        # Convert label to tensor and resize both to 518x518
         label = torch.from_numpy(label)
         img = TF.resize(img, [518, 518])
         label = TF.resize(label.unsqueeze(0), [518, 518], interpolation=TF.InterpolationMode.NEAREST).squeeze(0).long()
@@ -82,6 +73,7 @@ class DINOv2Backbone(nn.Module):
         out = feat.transpose(1, 2).reshape(B, D, H, W)
         return out
 
+
 class DINOv2_FCN(nn.Module):
     def __init__(self, num_classes=4):
         super().__init__()
@@ -102,19 +94,21 @@ class DINOv2_FCN(nn.Module):
         )
 
     def forward(self, x, data_samples=None, mode='loss'):
-        feat = self.backbone(x)  # (B, 768, 37, 37)
+        feat = self.backbone(x)
         if mode == 'loss':
             return self.decode_head.loss_by_feat(feat, data_samples)
         elif mode == 'predict':
             return self.decode_head.predict_by_feat(feat, batch_img_metas=[dict(ori_shape=x.shape[2:])])
         elif mode == 'tensor':
-            return self.decode_head.forward(feat)[0]
+            out = self.decode_head.forward([feat])
+            return out
         else:
             raise ValueError(f"Unsupported mode: {mode}")
 
+
 def train_one_epoch(model, loader, optimizer):
     model.train()
-    model.backbone.eval()  # Keep DINOv2 frozen
+    model.backbone.eval()
     total_loss = 0
 
     for i, (imgs, labels) in enumerate(tqdm(loader, desc='Training')):
@@ -133,14 +127,17 @@ def train_one_epoch(model, loader, optimizer):
 
     return total_loss / max(1, len(loader))
 
+
 def evaluate_test(model, loader):
     model.eval()
     num_classes = 4
     conf_mat = np.zeros((num_classes, num_classes), dtype=np.int64)
+
     with torch.no_grad():
         for imgs, labels in tqdm(loader, desc="Testing"):
             imgs, labels = imgs.to(device), labels.to(device)
             logits = model(imgs, mode='tensor')
+            logits = F.interpolate(logits, size=labels.shape[-2:], mode='bilinear', align_corners=False)
             preds = logits.argmax(dim=1)
             mask = (labels >= 0) & (labels < num_classes)
             conf_mat += np.bincount(
@@ -165,6 +162,7 @@ def evaluate_test(model, loader):
     print("".join(lines))
     return lines
 
+
 if __name__ == '__main__':
     taco_path = "data/CloudSen12+/TACOs/mini-cloudsen12-l1c-high-512.taco"
     indices = list(range(0, 10000))
@@ -176,7 +174,7 @@ if __name__ == '__main__':
     model = DINOv2_FCN().to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=6e-5, weight_decay=0.01)
 
-    for epoch in range(10):
+    for epoch in range(1):
         train_loss = train_one_epoch(model, train_loader, optimizer)
         print(f"Epoch {epoch+1}: Train Loss = {train_loss:.4f}")
 
