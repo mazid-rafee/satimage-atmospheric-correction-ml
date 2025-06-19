@@ -156,6 +156,6 @@ def train_and_evaluate(bands, combo_index, total_combos, result_path):
     print(f"Done InternImage | {metrics}")
 
 if __name__ == "__main__":
-    result_file = f"results/UPerNet_InternImage_CloudSen12_512px.txt"
+    result_file = f"results/UPerNet_InternImage_CloudSen12.txt"
     for i, bands in enumerate(band_combinations):
         train_and_evaluate(bands, i, len(band_combinations), result_file)

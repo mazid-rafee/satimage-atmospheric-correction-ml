@@ -89,7 +89,14 @@ model = build_segmentor(cfg.model)
 model.init_weights()
 model = model.to(device)
 
-optimizer = torch.optim.AdamW(model.parameters(), lr=6e-5, weight_decay=0.01)
+# To freeze the backbone
+# for param in model.backbone.parameters():
+#     param.requires_grad = False
+
+optimizer = torch.optim.AdamW(
+    filter(lambda p: p.requires_grad, model.parameters()),
+    lr=6e-5, weight_decay=0.01
+)
 
 def train_one_epoch(model, loader, optimizer):
     model.train()
@@ -147,7 +154,7 @@ def evaluate_test(model, loader):
     return lines
 
 if __name__ == '__main__':
-    for epoch in range(10):
+    for epoch in range(0):
         train_loss = train_one_epoch(model, train_loader, optimizer)
         print(f"Epoch {epoch+1}: Train Loss = {train_loss:.4f}")
 

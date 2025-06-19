@@ -143,7 +143,7 @@ def train_and_evaluate(bands, combo_index, total_combos, encoder_name, encoder_w
     print(f"Done UNet++ ({encoder_name}) | {metrics}")
 
 if __name__ == "__main__":
-    result_file = "results/UNetPlusPlus_CloudSen12_512px.txt"
+    result_file = "results/UNetPlusPlus_CloudSen12.txt"
     for encoder_cfg in encoder_configs:
         for idx, bands in enumerate(band_combinations):
             train_and_evaluate(

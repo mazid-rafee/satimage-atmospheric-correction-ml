@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '7'
 
 import torch
 import torch.nn as nn
@@ -59,6 +59,11 @@ class DINOv2Backbone(nn.Module):
         super().__init__()
         self.model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vitb14_reg')
         self.model.eval()
+
+        # To freeze the backbone
+        # for param in self.model.parameters():
+        #     param.requires_grad = False
+
 
     def forward(self, x):
         feat = self.model.get_intermediate_layers(x, n=4)
@@ -177,8 +182,8 @@ if __name__ == '__main__':
     indices = list(range(10000))
     train_ds = CloudSegmentationDataset(taco_path, indices[:8000], [3, 4, 10])
     test_ds = CloudSegmentationDataset(taco_path, indices[8000:], [3, 4, 10])
-    train_loader = DataLoader(train_ds, batch_size=8, shuffle=True, num_workers=4)
-    test_loader = DataLoader(test_ds, batch_size=8, shuffle=False, num_workers=4)
+    train_loader = DataLoader(train_ds, batch_size=16, shuffle=True, num_workers=4)
+    test_loader = DataLoader(test_ds, batch_size=16, shuffle=False, num_workers=4)
 
     for epoch in range(10):
         loss = train_one_epoch(model, train_loader, optimizer)

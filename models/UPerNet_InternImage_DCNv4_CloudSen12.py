@@ -1,4 +1,6 @@
 import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '7'
+
 import sys
 sys.path.append(os.path.abspath("DCNv4/segmentation"))
 from mmseg_custom.models.backbones import FlashInternImage
@@ -15,11 +17,11 @@ from mmengine.config import Config
 from mmseg.models import build_segmentor
 
 band_combinations = [
-    # [3, 4, 10],    # Green, Red, Cirrus
+    [3, 4, 10],    # Green, Red, Cirrus
     # [3, 8, 11],    # Green, NIR, SWIR1
-    [4, 6, 11],    # Red, RedEdge2, SWIR1
-    [2, 11, 12],   # Blue, SWIR1, SWIR2    
-    [4, 3, 2]     # RGB
+    # [4, 6, 11],    # Red, RedEdge2, SWIR1
+    # [2, 11, 12],   # Blue, SWIR1, SWIR2    
+    # [4, 3, 2]     # RGB
 ]
 
 
@@ -75,7 +77,7 @@ def train_and_evaluate(bands, combo_index, total_combos, result_path):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
-    for epoch in range(10):
+    for epoch in range(0):
         model.train(); total_loss = 0
         for imgs, labels in tqdm(train_loader, desc=f"InternImage | Combo {combo_index+1}/{total_combos} | Epoch {epoch+1}/10"):
             imgs = imgs.to("cuda")
@@ -163,6 +165,6 @@ def train_and_evaluate(bands, combo_index, total_combos, result_path):
     print(f"Done InternImage | {metrics}")
 
 if __name__ == "__main__":
-    result_file = f"results/UPerNet_InternImage_CloudSen12_512px.txt"
+    result_file = f"results/UPerNet_InternImage_CloudSen12.txt"
     for i, bands in enumerate(band_combinations):
         train_and_evaluate(bands, i, len(band_combinations), result_file)

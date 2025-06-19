@@ -12,7 +12,7 @@ import tacoreader
 import segmentation_models_pytorch as smp
 from tqdm import tqdm
 
-MODE = "multiclass"  # "binary" or "multiclass"
+MODE = "multiclass"
 
 band_combinations = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]]
 
@@ -135,7 +135,7 @@ def train_and_evaluate(bands, combo_index, total_combos, encoder_name, encoder_w
     print(f"Done {encoder_name} | {metrics}")
 
 if __name__ == "__main__":
-    result_file = f"results/DeepLabV3Plus_CloudSen12_512px.txt"
+    result_file = f"results/DeepLabV3Plus_CloudSen12.txt"
     for enc in encoder_configs:
         for i, bands in enumerate(band_combinations):
             train_and_evaluate(bands, i, len(band_combinations), enc["name"], enc["weights"], result_file, mode=MODE)

@@ -13,3 +13,11 @@ Bands: [3, 4, 10]
   Class 3: IoU=0.6878, F1=0.8150
   Mean IoU: 0.7509
   Mean F1: 0.8496
+
+Frozen Backbone | Bands: [3, 4, 10]
+  Class 0: IoU=0.8741, F1=0.9328
+  Class 1: IoU=0.8442, F1=0.9155
+  Class 2: IoU=0.4088, F1=0.5803
+  Class 3: IoU=0.5889, F1=0.7412
+  Mean IoU: 0.6790
+  Mean F1: 0.7925
