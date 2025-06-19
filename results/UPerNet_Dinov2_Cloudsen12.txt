@@ -1,0 +1,15 @@
+Epoch 1:
+  Class 0: IoU=0.8681, F1=0.9294
+  Class 1: IoU=0.8078, F1=0.8937
+  Class 2: IoU=0.4371, F1=0.6083
+  Class 3: IoU=0.5745, F1=0.7298
+  Mean IoU: 0.6719
+  Mean F1: 0.7903
+
+Epoch 10:
+  Class 0: IoU=0.8757, F1=0.9338
+  Class 1: IoU=0.8255, F1=0.9044
+  Class 2: IoU=0.4511, F1=0.6217
+  Class 3: IoU=0.6011, F1=0.7509
+  Mean IoU: 0.6884
+  Mean F1: 0.8027
