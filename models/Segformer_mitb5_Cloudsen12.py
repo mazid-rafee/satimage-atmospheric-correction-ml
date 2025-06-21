@@ -154,7 +154,7 @@ def evaluate_test(model, loader):
     return lines
 
 if __name__ == '__main__':
-    for epoch in range(0):
+    for epoch in range(10):
         train_loss = train_one_epoch(model, train_loader, optimizer)
         print(f"Epoch {epoch+1}: Train Loss = {train_loss:.4f}")
 

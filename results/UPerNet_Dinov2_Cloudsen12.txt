@@ -21,3 +21,11 @@ Frozen Backbone | Epoch 10:
   Class 3: IoU=0.5699, F1=0.7260
   Mean IoU: 0.6747
   Mean F1: 0.7941
+
+Epoch 10:
+  Class 0: IoU=0.8848, F1=0.9389
+  Class 1: IoU=0.8345, F1=0.9098
+  Class 2: IoU=0.5211, F1=0.6852
+  Class 3: IoU=0.6380, F1=0.7790
+  Mean IoU: 0.7196
+  Mean F1: 0.8282
