@@ -1,0 +1,15 @@
+Encoder: Dinov2 | Epoch 1 | Bands: [3, 4, 10]
+    Class 0: IoU=0.7452, F1=0.8540
+    Class 1: IoU=0.6726, F1=0.8042
+    Class 2: IoU=0.0744, F1=0.1385
+    Class 3: IoU=0.4852, F1=0.6534
+    Mean IoU: 0.4944
+    Mean F1: 0.6125
+
+Encoder: Dinov2 | Epoch 10 | Bands: [3, 4, 10]
+    Class 0: IoU=0.8507, F1=0.9193
+    Class 1: IoU=0.7869, F1=0.8807
+    Class 2: IoU=0.4313, F1=0.6027
+    Class 3: IoU=0.5928, F1=0.7443
+    Mean IoU: 0.6654
+    Mean F1: 0.7868

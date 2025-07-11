@@ -77,7 +77,7 @@ def train_and_evaluate(bands, combo_index, total_combos, result_path):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
-    for epoch in range(0):
+    for epoch in range(10):
         model.train(); total_loss = 0
         for imgs, labels in tqdm(train_loader, desc=f"InternImage | Combo {combo_index+1}/{total_combos} | Epoch {epoch+1}/10"):
             imgs = imgs.to("cuda")

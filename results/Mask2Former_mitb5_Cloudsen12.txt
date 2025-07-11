@@ -1,0 +1,7 @@
+Encoder: mit-b5 | Bands: [3, 4, 10]
+  Class 0: IoU=0.9039, F1=0.9495
+  Class 1: IoU=0.8641, F1=0.9271
+  Class 2: IoU=0.5274, F1=0.6906
+  Class 3: IoU=0.6803, F1=0.8098
+  Mean IoU: 0.7439
+  Mean F1: 0.8442

@@ -27,3 +27,30 @@ Epoch 10: Train Loss = 94.0084
 
 SegFormer mit_b5 Evaluation Results on L8Biome for Different Band Modes
 
+
+=== Band Mode: rgb ===
+Epoch 10: Train Loss = 93.4909
+  Class 0 (Clear): IoU=0.8850, F1=0.9390
+  Class 1 (Thick Cloud): IoU=0.7334, F1=0.8462
+  Class 2 (Thin Cloud): IoU=0.3859, F1=0.5569
+  Class 3 (Shadow): IoU=0.2160, F1=0.3552
+  Mean IoU: 0.5551
+  Mean F1: 0.6743
+
+=== Band Mode: 349 ===
+Epoch 10: Train Loss = 93.8960
+  Class 0 (Clear): IoU=0.8843, F1=0.9386
+  Class 1 (Thick Cloud): IoU=0.7199, F1=0.8372
+  Class 2 (Thin Cloud): IoU=0.3325, F1=0.4991
+  Class 3 (Shadow): IoU=0.1973, F1=0.3295
+  Mean IoU: 0.5335
+  Mean F1: 0.6511
+
+=== Band Mode: all ===
+Epoch 10: Train Loss = 94.0065
+  Class 0 (Clear): IoU=0.8664, F1=0.9284
+  Class 1 (Thick Cloud): IoU=0.7498, F1=0.8570
+  Class 2 (Thin Cloud): IoU=0.3931, F1=0.5644
+  Class 3 (Shadow): IoU=0.2623, F1=0.4155
+  Mean IoU: 0.5679
+  Mean F1: 0.6913

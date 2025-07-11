@@ -1,0 +1,36 @@
+
+=== Evaluation for Band Mode: rgb ===
+Epoch 1 Loss: 69.3031
+Epoch 2 Loss: 73.8786
+Epoch 3 Loss: 75.6692
+Epoch 4 Loss: 77.3561
+Epoch 5 Loss: 78.9335
+Epoch 6 Loss: 79.8403
+Epoch 7 Loss: 80.9678
+Epoch 8 Loss: 82.5454
+Epoch 9 Loss: 83.7928
+Epoch 10 Loss: 84.6013
+  Class 0: IoU=0.6197, F1=0.7652
+  Class 1: IoU=0.2227, F1=0.3643
+  Class 2: IoU=0.1075, F1=0.1942
+  Class 3: IoU=0.0903, F1=0.1657
+  Mean IoU: 0.2601
+  Mean F1: 0.3724
+
+=== Evaluation for Band Mode: 349 ===
+Epoch 1 Loss: 69.8627
+Epoch 2 Loss: 74.9010
+Epoch 3 Loss: 77.7086
+Epoch 4 Loss: 79.6729
+Epoch 5 Loss: 81.1847
+Epoch 6 Loss: 82.2182
+Epoch 7 Loss: 83.2881
+Epoch 8 Loss: 84.1288
+Epoch 9 Loss: 85.0042
+Epoch 10 Loss: 85.5092
+  Class 0: IoU=0.6376, F1=0.7787
+  Class 1: IoU=0.4357, F1=0.6069
+  Class 2: IoU=0.2877, F1=0.4469
+  Class 3: IoU=0.0003, F1=0.0006
+  Mean IoU: 0.3403
+  Mean F1: 0.4583

@@ -45,3 +45,11 @@ Backbone: InternImage_DCNv4_b | Combo 2/5 | Bands: [3, 8, 11] |
   Class 3: IoU=0.6595, F1=0.7912
   Mean IoU: 0.7070
   Mean F1: 0.8050
+  
+Backbone: InternImage_DCNv4_b with ODE | Combo 1/1 | Bands: [3, 4, 10] | 
+  Class 0: IoU=0.9024, F1=0.9477
+  Class 1: IoU=0.8506, F1=0.9169
+  Class 2: IoU=0.4291, F1=0.5527
+  Class 3: IoU=0.6720, F1=0.7983
+  Mean IoU: 0.7135
+  Mean F1: 0.8039
