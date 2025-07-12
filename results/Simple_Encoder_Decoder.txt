@@ -1,0 +1,35 @@
+CloudSEN12 Class Distribution (Pixel Counts and Ratios)
+
+Class Name       | Label | Pixel Count     | Ratio
+-----------------|-------|-----------------|--------
+clear            |   0   | 1139970852       | 54.36%
+thick cloud      |   1   | 563048672        | 26.85%
+thin cloud       |   2   | 204707875        | 9.76%
+cloud shadow     |   3   | 189424601        | 9.03%
+
+All 13 Bands:
+
+Epoch 20:
+  Class 0: IoU=0.8031, F1=0.8908
+  Class 1: IoU=0.7265, F1=0.8416
+  Class 2: IoU=0.2777, F1=0.4347
+  Class 3: IoU=0.4154, F1=0.5870
+  Mean IoU: 0.5557
+  Mean F1: 0.6885
+
+Epoch 50:
+  Class 0: IoU=0.8412, F1=0.9138
+  Class 1: IoU=0.7687, F1=0.8692
+  Class 2: IoU=0.2778, F1=0.4348
+  Class 3: IoU=0.4463, F1=0.6172
+  Mean IoU: 0.5835
+  Mean F1: 0.7087
+
+Epoch 100:
+  Class 0: IoU=0.8525, F1=0.9204
+  Class 1: IoU=0.7898, F1=0.8825
+  Class 2: IoU=0.3425, F1=0.5102
+  Class 3: IoU=0.4917, F1=0.6592
+  Mean IoU: 0.6191
+  Mean F1: 0.7431
+
