@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '7'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import torch
 from torch.utils.data import Dataset, DataLoader
 import rasterio as rio
@@ -45,8 +45,8 @@ selected_bands = [3, 4, 10]
 train_ds = CloudSegmentationDataset(taco_path, train_indices, selected_bands)
 test_ds = CloudSegmentationDataset(taco_path, test_indices, selected_bands)
 
-train_loader = DataLoader(train_ds, batch_size=16, shuffle=True, num_workers=4)
-test_loader = DataLoader(test_ds, batch_size=16, shuffle=False, num_workers=4)
+train_loader = DataLoader(train_ds, batch_size=8, shuffle=True, num_workers=4)
+test_loader = DataLoader(test_ds, batch_size=8, shuffle=False, num_workers=4)
 
 cfg = Config(dict(
     model=dict(
@@ -154,7 +154,7 @@ def evaluate_test(model, loader):
     return lines
 
 if __name__ == '__main__':
-    for epoch in range(10):
+    for epoch in range(5):
         train_loss = train_one_epoch(model, train_loader, optimizer)
         print(f"Epoch {epoch+1}: Train Loss = {train_loss:.4f}")
 

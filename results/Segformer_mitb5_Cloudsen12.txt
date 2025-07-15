@@ -1,4 +1,4 @@
-Bands: All 14 
+Bands: All 13 
   Class 0: IoU=0.8968, F1=0.9456
   Class 1: IoU=0.8538, F1=0.9211
   Class 2: IoU=0.5343, F1=0.6964
@@ -29,3 +29,11 @@ Bands: [3, 4, 10]
   Class 3: IoU=0.6844, F1=0.8127
   Mean IoU: 0.7544
   Mean F1: 0.8527
+
+Bands: [3, 4, 10] (100 Epochs)
+  Class 0: IoU=0.9055, F1=0.9504
+  Class 1: IoU=0.8606, F1=0.9251
+  Class 2: IoU=0.5261, F1=0.6894
+  Class 3: IoU=0.6804, F1=0.8098
+  Mean IoU: 0.7431
+  Mean F1: 0.8437

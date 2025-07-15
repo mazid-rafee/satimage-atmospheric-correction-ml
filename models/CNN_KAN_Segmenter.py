@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 import torch
 import torch.nn as nn
@@ -8,6 +8,8 @@ import rasterio as rio
 import numpy as np
 import tacoreader
 from tqdm import tqdm
+from fastkan import FastKAN as KAN
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -31,23 +33,33 @@ class CloudSegmentationDataset(Dataset):
         label = torch.from_numpy(label).long()
         return img, label
 
-class SimpleEncoderDecoder(nn.Module):
+class CNN_KAN_Bottleneck(nn.Module):
     def __init__(self, in_channels, num_classes=4):
         super().__init__()
-        self.enc1 = nn.Sequential(nn.Conv2d(in_channels, 32, 3, 1, 1), nn.ReLU(), nn.MaxPool2d(2))
-        self.enc2 = nn.Sequential(nn.Conv2d(32, 64, 3, 1, 1), nn.ReLU(), nn.MaxPool2d(2))
-        self.bottleneck = nn.Sequential(nn.Conv2d(64, 128, 3, 1, 1), nn.ReLU())
-        self.dec2 = nn.Sequential(nn.ConvTranspose2d(128, 64, 2, 2), nn.ReLU())
-        self.dec1 = nn.Sequential(nn.ConvTranspose2d(64, 32, 2, 2), nn.ReLU())
-        self.out = nn.Conv2d(32, num_classes, 1)
+        self.encoder = nn.Sequential(
+            nn.Conv2d(in_channels, 32, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),
+            nn.Conv2d(32, 64, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),  
+            nn.Conv2d(64, 128, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2)
+        )
+
+        #self.kan = KAN(width=[128, 64, 128], noise_scale=0.3, device=device)
+        self.kan = KAN([128, 64, 128])
+
+
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(128, 64, 2, 2), nn.ReLU(),
+            nn.ConvTranspose2d(64, 32, 2, 2), nn.ReLU(),
+            nn.ConvTranspose2d(32, 16, 2, 2), nn.ReLU(),
+            nn.Conv2d(16, num_classes, 1)
+        )
 
     def forward(self, x):
-        x = self.enc1(x)
-        x = self.enc2(x)
-        x = self.bottleneck(x)
-        x = self.dec2(x)
-        x = self.dec1(x)
-        return self.out(x)
+        x = self.encoder(x)                         
+        B, C, H, W = x.shape
+        x = x.permute(0, 2, 3, 1).reshape(-1, C)        
+        x = self.kan(x)                                  
+        x = x.view(B, H, W, C).permute(0, 3, 1, 2)        
+        return self.decoder(x)                         
 
 def train_one_epoch(model, loader, optimizer):
     model.train()
@@ -100,7 +112,7 @@ if __name__ == '__main__':
     }
 
     os.makedirs("results", exist_ok=True)
-    log_path = "results/Simple_Encoder_Decoder.txt"
+    log_path = "results/CNN_KAN_Segmenter.txt"
 
     with open(log_path, "a") as log_file:
         for name, selected_bands in band_sets.items():
@@ -113,7 +125,7 @@ if __name__ == '__main__':
             train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=4)
             test_loader = DataLoader(test_dataset, batch_size=8, shuffle=False, num_workers=4)
 
-            model = SimpleEncoderDecoder(in_channels=len(selected_bands), num_classes=4).to(device)
+            model = CNN_KAN_Bottleneck(in_channels=len(selected_bands), num_classes=4).to(device)
             optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
             for epoch in range(100):
