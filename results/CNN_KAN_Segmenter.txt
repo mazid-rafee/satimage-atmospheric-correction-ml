@@ -11,10 +11,10 @@ cloud shadow     |   3   | 189424601        | 9.03%
 All 13 Bands:
 
 Epoch 100:
-  Class 0: IoU=0.8760, F1=0.9339
-  Class 1: IoU=0.8383, F1=0.9120
-  Class 2: IoU=0.4169, F1=0.5885
-  Class 3: IoU=0.5636, F1=0.7209
-  Mean IoU: 0.6737
-  Mean F1: 0.7888
+  Class 0: IoU=0.8913, F1=0.9425
+  Class 1: IoU=0.8362, F1=0.9108
+  Class 2: IoU=0.4971, F1=0.6641
+  Class 3: IoU=0.6168, F1=0.7630
+  Mean IoU: 0.7103
+  Mean F1: 0.8201
 

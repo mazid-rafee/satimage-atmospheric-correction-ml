@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 import torch
 import torch.nn as nn
@@ -9,10 +9,13 @@ import numpy as np
 import tacoreader
 from tqdm import tqdm
 from fastkan import FastKAN as KAN
+import torch.nn.functional as F
 
 
+# Device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+# Dataset
 class CloudSegmentationDataset(Dataset):
     def __init__(self, taco_path, indices, selected_bands):
         self.dataset = tacoreader.load(taco_path)
@@ -33,12 +36,39 @@ class CloudSegmentationDataset(Dataset):
         label = torch.from_numpy(label).long()
         return img, label
 
+# ASPP Module
+class ASPP(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.atrous_block1 = nn.Conv2d(in_channels, out_channels, kernel_size=1, padding=0, dilation=1)
+        self.atrous_block6 = nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=6, dilation=6)
+        self.atrous_block12 = nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=12, dilation=12)
+        self.atrous_block18 = nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=18, dilation=18)
+        self.global_avg_pool = nn.Sequential(
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Conv2d(in_channels, out_channels, kernel_size=1),
+        )
+        self.conv1 = nn.Conv2d(out_channels * 5, out_channels, kernel_size=1)
+        self.bn = nn.BatchNorm2d(out_channels)
+        self.relu = nn.ReLU()
 
+    def forward(self, x):
+        x1 = self.atrous_block1(x)
+        x2 = self.atrous_block6(x)
+        x3 = self.atrous_block12(x)
+        x4 = self.atrous_block18(x)
+        x5 = self.global_avg_pool(x)
+        x5 = F.interpolate(x5, size=x4.shape[2:], mode='bilinear', align_corners=False)
+        x = torch.cat([x1, x2, x3, x4, x5], dim=1)
+        x = self.conv1(x)
+        x = self.bn(x)
+        return self.relu(x)
+
+# CNN-KAN-ASPP Model
 class CNN_KAN_Bottleneck(nn.Module):
     def __init__(self, in_channels, num_classes=4):
         super().__init__()
 
-        # Encoder
         self.encoder = nn.Sequential(
             nn.Conv2d(in_channels, 64, kernel_size=3, padding=1), nn.BatchNorm2d(64), nn.ReLU(), nn.MaxPool2d(2),
             nn.Conv2d(64, 128, kernel_size=3, padding=1), nn.BatchNorm2d(128), nn.ReLU(), nn.MaxPool2d(2),
@@ -46,10 +76,9 @@ class CNN_KAN_Bottleneck(nn.Module):
             nn.Conv2d(256, 512, kernel_size=3, padding=1), nn.BatchNorm2d(512), nn.ReLU(), nn.MaxPool2d(2)
         )
 
-        # Bottleneck: KAN
+        self.aspp = ASPP(in_channels=512, out_channels=512)
         self.kan = KAN([512, 256, 256, 512])
 
-        # Decoder
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2), nn.BatchNorm2d(256), nn.ReLU(),
             nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2), nn.BatchNorm2d(128), nn.ReLU(),
@@ -59,14 +88,15 @@ class CNN_KAN_Bottleneck(nn.Module):
         )
 
     def forward(self, x):
-        x = self.encoder(x)                    # Shape: [B, 512, H/16, W/16]
+        x = self.encoder(x)                    # [B, 512, H/16, W/16]
+        x = self.aspp(x)                       # ASPP context
         B, C, H, W = x.shape
         x = x.permute(0, 2, 3, 1).reshape(-1, C)
         x = self.kan(x)
         x = x.view(B, H, W, C).permute(0, 3, 1, 2)
         return self.decoder(x)
 
-
+# Training function
 def train_one_epoch(model, loader, optimizer):
     model.train()
     total_loss = 0
@@ -81,6 +111,7 @@ def train_one_epoch(model, loader, optimizer):
         total_loss += loss.item()
     return total_loss / len(loader)
 
+# Evaluation function
 def fast_confusion_matrix(preds, labels, num_classes=4):
     mask = (labels >= 0) & (labels < num_classes)
     return np.bincount(num_classes * labels[mask] + preds[mask], minlength=num_classes**2).reshape(num_classes, num_classes)
@@ -110,6 +141,7 @@ def evaluate_test(model, loader):
     lines.append(f"  Mean F1: {np.mean(f1s):.4f}\n")
     return lines
 
+# Main script
 if __name__ == '__main__':
     taco_path = "data/CloudSen12+/TACOs/mini-cloudsen12-l1c-high-512.taco"
     indices = list(range(10000))
