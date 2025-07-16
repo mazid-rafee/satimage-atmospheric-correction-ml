@@ -33,11 +33,3 @@ Epoch 100:
   Class 3: IoU=0.4917, F1=0.6592
   Mean IoU: 0.6191
   Mean F1: 0.7431
-
-Epoch 1:
-  Class 0: IoU=0.7220, F1=0.8386
-  Class 1: IoU=0.6052, F1=0.7540
-  Class 2: IoU=0.0000, F1=0.0000
-  Class 3: IoU=0.0000, F1=0.0000
-  Mean IoU: 0.3318
-  Mean F1: 0.3981

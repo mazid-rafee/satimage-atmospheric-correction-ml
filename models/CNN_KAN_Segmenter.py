@@ -33,33 +33,39 @@ class CloudSegmentationDataset(Dataset):
         label = torch.from_numpy(label).long()
         return img, label
 
+
 class CNN_KAN_Bottleneck(nn.Module):
     def __init__(self, in_channels, num_classes=4):
         super().__init__()
+
+        # Encoder
         self.encoder = nn.Sequential(
-            nn.Conv2d(in_channels, 32, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),
-            nn.Conv2d(32, 64, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),  
-            nn.Conv2d(64, 128, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2)
+            nn.Conv2d(in_channels, 64, kernel_size=3, padding=1), nn.BatchNorm2d(64), nn.ReLU(), nn.MaxPool2d(2),
+            nn.Conv2d(64, 128, kernel_size=3, padding=1), nn.BatchNorm2d(128), nn.ReLU(), nn.MaxPool2d(2),
+            nn.Conv2d(128, 256, kernel_size=3, padding=1), nn.BatchNorm2d(256), nn.ReLU(), nn.MaxPool2d(2),
+            nn.Conv2d(256, 512, kernel_size=3, padding=1), nn.BatchNorm2d(512), nn.ReLU(), nn.MaxPool2d(2)
         )
 
-        #self.kan = KAN(width=[128, 64, 128], noise_scale=0.3, device=device)
-        self.kan = KAN([128, 64, 128])
+        # Bottleneck: KAN
+        self.kan = KAN([512, 256, 256, 512])
 
-
+        # Decoder
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(128, 64, 2, 2), nn.ReLU(),
-            nn.ConvTranspose2d(64, 32, 2, 2), nn.ReLU(),
-            nn.ConvTranspose2d(32, 16, 2, 2), nn.ReLU(),
-            nn.Conv2d(16, num_classes, 1)
+            nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2), nn.BatchNorm2d(256), nn.ReLU(),
+            nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2), nn.BatchNorm2d(128), nn.ReLU(),
+            nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2), nn.BatchNorm2d(64), nn.ReLU(),
+            nn.ConvTranspose2d(64, 32, kernel_size=2, stride=2), nn.BatchNorm2d(32), nn.ReLU(),
+            nn.Conv2d(32, num_classes, kernel_size=1)
         )
 
     def forward(self, x):
-        x = self.encoder(x)                         
+        x = self.encoder(x)                    # Shape: [B, 512, H/16, W/16]
         B, C, H, W = x.shape
-        x = x.permute(0, 2, 3, 1).reshape(-1, C)        
-        x = self.kan(x)                                  
-        x = x.view(B, H, W, C).permute(0, 3, 1, 2)        
-        return self.decoder(x)                         
+        x = x.permute(0, 2, 3, 1).reshape(-1, C)
+        x = self.kan(x)
+        x = x.view(B, H, W, C).permute(0, 3, 1, 2)
+        return self.decoder(x)
+
 
 def train_one_epoch(model, loader, optimizer):
     model.train()
