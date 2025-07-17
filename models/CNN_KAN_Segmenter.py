@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '7'
 
 import torch
 import torch.nn as nn
@@ -35,6 +35,32 @@ class CloudSegmentationDataset(Dataset):
         img = torch.from_numpy(img / 3000.0).float()
         label = torch.from_numpy(label).long()
         return img, label
+
+# PSP Module
+class PSPModule(nn.Module):
+    def __init__(self, in_channels, pool_sizes, out_channels):
+        super().__init__()
+        self.stages = nn.ModuleList([
+            nn.Sequential(
+                nn.AdaptiveAvgPool2d(output_size=ps),
+                nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(inplace=True)
+            )
+            for ps in pool_sizes
+        ])
+        self.bottleneck = nn.Sequential(
+            nn.Conv2d(in_channels + len(pool_sizes) * out_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True)
+        )
+
+    def forward(self, x):
+        h, w = x.size(2), x.size(3)
+        pyramids = [x] + [F.interpolate(stage(x), size=(h, w), mode='bilinear', align_corners=False) for stage in self.stages]
+        output = torch.cat(pyramids, dim=1)
+        return self.bottleneck(output)
+
 
 # ASPP Module
 class ASPP(nn.Module):
@@ -76,8 +102,10 @@ class CNN_KAN_Bottleneck(nn.Module):
             nn.Conv2d(256, 512, kernel_size=3, padding=1), nn.BatchNorm2d(512), nn.ReLU(), nn.MaxPool2d(2)
         )
 
-        self.aspp = ASPP(in_channels=512, out_channels=512)
+        self.aspp = ASPP(in_channels=512, out_channels=256)
+        self.psp = PSPModule(in_channels=512, pool_sizes=[1, 2, 3, 6], out_channels=256)
         self.kan = KAN([512, 256, 256, 512])
+
 
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2), nn.BatchNorm2d(256), nn.ReLU(),
@@ -88,12 +116,16 @@ class CNN_KAN_Bottleneck(nn.Module):
         )
 
     def forward(self, x):
-        x = self.encoder(x)                    # [B, 512, H/16, W/16]
-        x = self.aspp(x)                       # ASPP context
+        x = self.encoder(x)                             # [B, 512, H/16, W/16]
+        x_aspp = self.aspp(x)                           # [B, 256, H/16, W/16]
+        x_psp = self.psp(x)                             # [B, 256, H/16, W/16]
+        x = torch.cat([x_aspp, x_psp], dim=1)           # [B, 512, H/16, W/16]
+
         B, C, H, W = x.shape
-        x = x.permute(0, 2, 3, 1).reshape(-1, C)
+        x = x.permute(0, 2, 3, 1).reshape(-1, C)        # Flatten spatial
         x = self.kan(x)
         x = x.view(B, H, W, C).permute(0, 3, 1, 2)
+        
         return self.decoder(x)
 
 # Training function
@@ -154,9 +186,6 @@ if __name__ == '__main__':
 
     with open(log_path, "a") as log_file:
         for name, selected_bands in band_sets.items():
-            print(f"\n=== Training with {name} ===\n")
-            log_file.write(f"\n=== Training with {name} ===\n")
-
             train_dataset = CloudSegmentationDataset(taco_path, indices[:8000], selected_bands)
             test_dataset = CloudSegmentationDataset(taco_path, indices[8000:], selected_bands)
 
@@ -169,8 +198,11 @@ if __name__ == '__main__':
             for epoch in range(100):
                 train_loss = train_one_epoch(model, train_loader, optimizer)
                 print(f"Epoch {epoch + 1}: Train Loss = {train_loss:.4f}")
-                log_file.write(f"Epoch {epoch + 1}: Train Loss = {train_loss:.4f}\n")
 
-            results = evaluate_test(model, test_loader)
-            log_file.writelines(results)
-            log_file.write("\n" + "="*60 + "\n")
+
+                if (epoch + 1) in [10, 20, 50, 100]:
+                    results = evaluate_test(model, test_loader)
+                    print(f"\nEvaluation after Epoch {epoch + 1}:\n" + "".join(results))
+                    log_file.write(f"\nEvaluation after Epoch {epoch + 1}:\n")
+                    log_file.writelines(results)
+                    log_file.write("\n")
