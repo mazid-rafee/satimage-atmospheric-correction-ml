@@ -11,9 +11,51 @@ from tqdm import tqdm
 from fastkan import FastKAN as KAN
 import torch.nn.functional as F
 
-
 # Device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+class ChannelAttention(nn.Module):
+    def __init__(self, in_channels, ratio=8):
+        super().__init__()
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.max_pool = nn.AdaptiveMaxPool2d(1)
+
+        self.shared = nn.Sequential(
+            nn.Conv2d(in_channels, in_channels // ratio, 1, bias=False),
+            nn.ReLU(),
+            nn.Conv2d(in_channels // ratio, in_channels, 1, bias=False)
+        )
+
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        avg_out = self.shared(self.avg_pool(x))
+        max_out = self.shared(self.max_pool(x))
+        return self.sigmoid(avg_out + max_out)
+
+class SpatialAttention(nn.Module):
+    def __init__(self, kernel_size=7):
+        super().__init__()
+        padding = kernel_size // 2
+        self.conv = nn.Conv2d(2, 1, kernel_size, padding=padding, bias=False)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        avg_out = torch.mean(x, dim=1, keepdim=True)
+        max_out, _ = torch.max(x, dim=1, keepdim=True)
+        x = torch.cat([avg_out, max_out], dim=1)
+        return self.sigmoid(self.conv(x))
+
+class CBAM(nn.Module):
+    def __init__(self, in_channels, ratio=8, kernel_size=7):
+        super().__init__()
+        self.channel_att = ChannelAttention(in_channels, ratio)
+        self.spatial_att = SpatialAttention(kernel_size)
+
+    def forward(self, x):
+        x = x * self.channel_att(x)
+        x = x * self.spatial_att(x)
+        return x
 
 # Dataset
 class CloudSegmentationDataset(Dataset):
@@ -104,6 +146,7 @@ class CNN_KAN_Bottleneck(nn.Module):
 
         self.aspp = ASPP(in_channels=512, out_channels=256)
         self.psp = PSPModule(in_channels=512, pool_sizes=[1, 2, 3, 6], out_channels=256)
+        self.cbam = CBAM(in_channels=512)
         self.kan = KAN([512, 256, 256, 512])
 
 
@@ -120,6 +163,7 @@ class CNN_KAN_Bottleneck(nn.Module):
         x_aspp = self.aspp(x)                           # [B, 256, H/16, W/16]
         x_psp = self.psp(x)                             # [B, 256, H/16, W/16]
         x = torch.cat([x_aspp, x_psp], dim=1)           # [B, 512, H/16, W/16]
+        x = self.cbam(x)
 
         B, C, H, W = x.shape
         x = x.permute(0, 2, 3, 1).reshape(-1, C)        # Flatten spatial
