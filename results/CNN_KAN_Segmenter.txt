@@ -26,3 +26,21 @@ Evaluation after Epoch 100 With CBAM:
   Mean IoU: 0.7244
   Mean F1: 0.8310
 
+
+Final Test Evaluation:
+  Class 0: IoU=0.9051, F1=0.9502
+  Class 1: IoU=0.8501, F1=0.9190
+  Class 2: IoU=0.4964, F1=0.6635
+  Class 3: IoU=0.6533, F1=0.7903
+  Mean IoU: 0.7263
+  Mean F1: 0.8308
+
+
+Final Test Evaluation:
+  Class 0: IoU=0.9032, F1=0.9492
+  Class 1: IoU=0.8542, F1=0.9214
+  Class 2: IoU=0.4848, F1=0.6530
+  Class 3: IoU=0.6555, F1=0.7919
+  Mean IoU: 0.7244
+  Mean F1: 0.8289
+
