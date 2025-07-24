@@ -14,6 +14,37 @@ import torch.nn.functional as F
 # Device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+class SEBlock(nn.Module):
+    def __init__(self, in_channels, reduction=16):
+        super(SEBlock, self).__init__()
+        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.fc = nn.Sequential(
+            nn.Linear(in_channels, in_channels // reduction),
+            nn.ReLU(inplace=True),
+            nn.Linear(in_channels // reduction, in_channels),
+            nn.Sigmoid()
+        )
+
+    def forward(self, x):
+        b, c, _, _ = x.size()
+        y = self.pool(x).view(b, c)
+        y = self.fc(y).view(b, c, 1, 1)
+        return x * y
+
+class ECABlock(nn.Module):
+    def __init__(self, in_channels, k_size=3):
+        super(ECABlock, self).__init__()
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.conv = nn.Conv1d(1, 1, kernel_size=k_size, padding=k_size//2, bias=False)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        b, c, _, _ = x.size()
+        y = self.avg_pool(x).squeeze(-1).transpose(-1, -2)  
+        y = self.conv(y).transpose(-1, -2).unsqueeze(-1) 
+        y = self.sigmoid(y)
+        return x * y
+
 class ChannelAttention(nn.Module):
     def __init__(self, in_channels, ratio=8):
         super().__init__()
@@ -54,6 +85,20 @@ class CBAM(nn.Module):
         x = x * self.channel_att(x)
         x = x * self.spatial_att(x)
         return x
+
+class CombinedAttention(nn.Module):
+    def __init__(self, in_channels):
+        super().__init__()
+        self.se = SEBlock(in_channels)
+        self.cbam = CBAM(in_channels)
+        self.eca = ECABlock(in_channels)
+
+    def forward(self, x):
+        x = self.se(x)
+        x = self.cbam(x)
+        x = self.eca(x)
+        return x
+
 
 class CloudSegmentationDataset(Dataset):
     def __init__(self, taco_path, indices, selected_bands):
@@ -137,7 +182,8 @@ class CNN_KAN_Segmenter(nn.Module):
 
         self.aspp = ASPP(512, 256)
         self.psp = PSPModule(512, [1, 2, 3, 6], 256)
-        self.cbam = CBAM(512)
+        self.cbam = CombinedAttention(512)
+
         self.kan = KAN([512, 256, 256, 512])
 
         self.dec1 = nn.Sequential(

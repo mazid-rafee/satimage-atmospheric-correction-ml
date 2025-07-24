@@ -44,3 +44,29 @@ Evaluation of Best Model:
 
 
 
+
+Evaluation of Best Model:
+  Class 0: IoU=0.9029, F1=0.9490
+  Class 1: IoU=0.8500, F1=0.9189
+  Class 2: IoU=0.4917, F1=0.6592
+  Class 3: IoU=0.6570, F1=0.7930
+  Mean IoU: 0.7254
+  Mean F1: 0.8300
+
+
+Evaluation of Last Model:
+  Class 0: IoU=0.9084, F1=0.9520
+  Class 1: IoU=0.8585, F1=0.9239
+  Class 2: IoU=0.4974, F1=0.6644
+  Class 3: IoU=0.6636, F1=0.7978
+  Mean IoU: 0.7320
+  Mean F1: 0.8345
+
+[Model Complexity for Bands_All_1_to_13]
+FLOPs: 33.58 GMac
+Parameters: 13.51 M
+
+[Model Complexity for Bands_All_1_to_13]
+FLOPs: 33.58 GMac
+Parameters: 13.51 M
+
